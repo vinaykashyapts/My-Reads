@@ -11,7 +11,7 @@ const BookGrid = ({ book, handleBookShelf }) => {
                 <div className="book-top">
                     <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${imageThumbnail})` }}></div>
                         <div className="book-shelf-changer">
-                            <select id="bookState" onChange={e => handleBookShelf(book, e.target.value)} value={book.shelf} >
+                            <select onChange={e => handleBookShelf(book, e.target.value)} value={book.shelf} >
                                 <option value="none" disabled>Move to...</option>
                                 <option value="currentlyReading">Currently Reading</option>
                                 <option value="wantToRead">Want to Read</option>

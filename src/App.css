@@ -172,3 +172,25 @@ body, .app {
   text-align: center;
   font-size: 0.8em;
 }
+
+.loader {
+    border: 6px solid #f3f3f3; /* Light grey */
+    border-top: 6px solid #2e7c31; /* Green */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    position: fixed; /* or absolute */
+    top: 50%;
+    left: 50%;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-results {
+  text-align: center;
+  margin: 20px 0;
+}

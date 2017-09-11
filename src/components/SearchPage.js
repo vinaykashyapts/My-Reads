@@ -3,43 +3,42 @@ import { Link } from 'react-router-dom';
 import BookGrid from './BookGrid';
 import * as BooksAPI from '../BooksAPI';
 
-
 class SearchPage extends Component {
+  
   state = {
-      books: [],
-      query: ''
+    books: [],
+    query: '',
+    loading: false
   };
 
   handleUpdateQuery(query) {
-      BooksAPI.search(query).then(books => books ? this.setState({ books }) : []);
-      this.setState({ query });
-  }
-
-  handleBookShelf(book, shelf) {
-    BooksAPI.update(book, shelf)
-        .then(() => shelf !== 'none' ? alert(`${book.title} has been added to your shelf!`) : null)
-        .catch(() => alert('Something has went wrong! Please try again!'));
-  }
-
-  renderSearchResults() {
-    const { books, query } = this.state;
-
-    if (query) {
-      return books.error ?
-        <div>No results found</div>
-        : books.map((book, index) => {
-            return (
-                <BookGrid
-                    key={index}
-                    book={book}
-                    handleBookShelf={this.handleBookShelf.bind(this)}
-                />
-            );
-        });
+    if(query === '') {
+      this.setState({query: '', books: [], loading: false})
+    } else {
+      this.setState({loading: true})
+      BooksAPI.search(query).then(books => {
+        if (books instanceof Array) {
+          books = books.map((book) => {
+            const bookInShelf = this.props.books.find(b => b.id === book.id);
+            if (bookInShelf) {
+                book.shelf = bookInShelf.shelf;
+            }
+            return book;
+          });
+        } else {
+          if (books.error) {
+              books = [];
+          }
+        }
+        this.setState({books: books, loading: false})
+      });
+      this.setState({query})
     }
   }
 
   render() {
+    const { books, query, loading } = this.state
+
     return (
       <div className="search-books">
         <div className="search-books-bar">
@@ -50,18 +49,34 @@ class SearchPage extends Component {
           </Link>
           <div className="search-books-input-wrapper">
             <input
-                type="text"
-                placeholder="Search by title or author"
-                value={this.state.query}
-                onChange={e => this.handleUpdateQuery(e.target.value)}
+              type="text"
+              placeholder="Search by title or author"
+              value={query}
+              onChange={e => this.handleUpdateQuery(e.target.value)}
             />
           </div>
         </div>
-        <div className="search-books-results">
-          <ol className="books-grid">
-              {this.renderSearchResults()}
-          </ol>
-        </div>
+        {!loading && (
+          <div className="search-books-results">
+            {query && books.length === 0 && !loading && (
+              <div className="no-results">No results found</div>
+            )}
+            <ol className="books-grid">
+              {books.map((book, index) => {
+                return (
+                  <BookGrid
+                    key={index}
+                    book={book}
+                    handleBookShelf={this.props.handleBookShelf}
+                  />
+                );
+              })}
+            </ol>
+          </div>
+        )}
+        {loading && (
+          <div className="loader"/>
+        )}     
       </div>
     );
   }

@@ -1,59 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import escapeRegExp from 'escape-string-regexp'
 import BookGrid from './BookGrid';
-import * as BooksAPI from '../BooksAPI';
 
-class BooksList extends Component {
-    state = {
-        currentlyReading: [],
-        wantToRead: [],
-        read: []
-    };
-
-    componentDidMount() {
-        this.getBooks();
-    }
-
-    getBooks() {
-        BooksAPI.getAll().then(books => {
-            const filterCurrentlyReading = new RegExp(escapeRegExp('currentlyReading'));
-            let currentlyReading = books ? books.filter(book => filterCurrentlyReading.test(book.shelf)) : null;
-
-            const filterWantToRead = new RegExp(escapeRegExp('wantToRead'));
-            let wantToRead = books ? books.filter(book => filterWantToRead.test(book.shelf)) : null;
-
-            const filterRead = new RegExp(escapeRegExp('read'));
-            let read = books ? books.filter(book => filterRead.test(book.shelf)) : null;
-
-            this.setState({ currentlyReading, wantToRead, read });
-        });
-    }
-
-    handleBookShelf(book, shelf) {
-        BooksAPI.update(book, shelf).then(() => this.getBooks());
-    }
-
-    renderShelf(books, shelfTitle) {
-        return (
-            <div className="bookshelf">
-                <h2 className="bookshelf-title">{shelfTitle}</h2>
-                <div className="bookshelf-books">
-                    <ol className="books-grid">
-                        {books.map((book, index) =>
-                            <BookGrid
-                                key={index}
-                                book={book}
-                                handleBookShelf={this.handleBookShelf.bind(this)}
-                            />)}
-                    </ol>
-                </div>
-            </div>
-        )
-    }
+class BooksList extends Component { 
 
     render() {
-        const { currentlyReading, wantToRead, read } = this.state;
+        const { currentlyReading, wantToRead, read } = this.props
 
         return (
             <div className="list-books">
@@ -75,7 +27,25 @@ class BooksList extends Component {
                 </div>
             </div>
         );
-  }
+    }
+
+    renderShelf(books, shelfTitle) {
+        return (
+            <div className="bookshelf">
+                <h2 className="bookshelf-title">{shelfTitle}</h2>
+                <div className="bookshelf-books">
+                    <ol className="books-grid">
+                        {books.map((book, index) =>
+                            <BookGrid
+                                key={index}
+                                book={book}
+                                handleBookShelf={this.props.handleBookShelf}
+                            />)}
+                    </ol>
+                </div>
+            </div>
+        )
+    }
 }
 
 export default BooksList;
