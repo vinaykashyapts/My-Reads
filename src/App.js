@@ -7,6 +7,10 @@ import './App.css';
 
 class BooksApp extends React.Component {
   
+  constructor(props) {
+    super(props);
+    this.handleBookShelf = this.handleBookShelf.bind(this);
+  }
   state = {
       books: [],
       loading: true
@@ -57,7 +61,7 @@ class BooksApp extends React.Component {
                 currentlyReading={currentlyReading} 
                 wantToRead={wantToRead} 
                 read={read} 
-                handleBookShelf={this.handleBookShelf.bind(this)}
+                handleBookShelf={this.handleBookShelf}
               />
               ) : (
                 <div className="loader"/>
@@ -66,7 +70,7 @@ class BooksApp extends React.Component {
           <Route path="/search" render={({ history }) => (
             <SearchPage 
               ref={(ref) => this.Search = ref}
-              handleBookShelf={this.handleBookShelf.bind(this)}
+              handleBookShelf={this.handleBookShelf}
               history={history}
               books={currentlyReading.concat(wantToRead, read)}
             />
