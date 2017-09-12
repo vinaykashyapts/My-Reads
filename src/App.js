@@ -23,22 +23,23 @@ class BooksApp extends React.Component {
   }
 
   handleBookShelf = (book, shelf) => {
-    BooksAPI.update(book, shelf)
-        .then(
-          this.setState((state) => ({
-            books: state.books.map(b => {
-              if (b.title === book.title) {
-                  b.shelf = shelf;
-                  return b
-              } else {
-                  return b
-              }
-            }),
-            loading: false
-          })),
-          location.pathname === '/search' ? alert(`${book.title} has been added to your shelf!`) : null
-        )
-    };
+    if (book.shelf !== shelf) {
+      BooksAPI.update(book, shelf).then(() => {
+        book.shelf = shelf
+        this.setState(state => ({
+          books: this.state.books.filter(b => b.id !== book.id).concat([ book ]),
+          loading: false
+        }))
+        this.notifyUser(book)
+      })
+    }
+  };
+
+  notifyUser = (book) => {
+    location.pathname === '/search' ? 
+         this.Search.dialog.showAlert(`${book.title} has been added to your shelf!`)  // TO DO : Style dialog to make it look better
+         : null
+  }
 
   render() {
     const state = this.state;
@@ -49,6 +50,7 @@ class BooksApp extends React.Component {
     return (
       <BrowserRouter>
         <div className="app">
+
           <Route exact path="/" render={() => (
             !state.loading ?(
               <BooksList 
@@ -62,12 +64,13 @@ class BooksApp extends React.Component {
               )
           )}/>
           <Route path="/search" render={({ history }) => (
-            <SearchPage
+            <SearchPage 
+              ref={(ref) => this.Search = ref}
               handleBookShelf={this.handleBookShelf.bind(this)}
               history={history}
               books={currentlyReading.concat(wantToRead, read)}
             />
-          )}/>  
+          )}/> 
         </div>
       </BrowserRouter>
     );

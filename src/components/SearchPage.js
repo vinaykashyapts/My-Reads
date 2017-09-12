@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import BookGrid from './BookGrid';
 import * as BooksAPI from '../BooksAPI';
+import Dialog from 'react-bootstrap-dialog'
 
 class SearchPage extends Component {
   
@@ -10,6 +11,10 @@ class SearchPage extends Component {
     query: '',
     loading: false
   };
+
+  componentDidMount() {
+    this.props.ref.bind(this)
+  }
 
   handleUpdateQuery(query) {
     if(query === '') {
@@ -22,6 +27,8 @@ class SearchPage extends Component {
             const bookInShelf = this.props.books.find(b => b.id === book.id);
             if (bookInShelf) {
                 book.shelf = bookInShelf.shelf;
+            } else {
+                book.shelf = "None"
             }
             return book;
           });
@@ -56,6 +63,7 @@ class SearchPage extends Component {
             />
           </div>
         </div>
+        <Dialog ref={(ref) => this.dialog = ref} />
         {!loading && (
           <div className="search-books-results">
             {query && books.length === 0 && !loading && (
